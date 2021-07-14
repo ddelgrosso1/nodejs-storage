@@ -81,6 +81,13 @@ const fakeUtil = Object.assign({}, util, {
   ) {
     callback(null);
   },
+  makeRequest(
+    reqOpts: DecorateRequestOptions,
+    config: object,
+    callback: BodyResponseCallback
+  ) {
+    callback(null);
+  },
 });
 
 const fakePromisify = {
