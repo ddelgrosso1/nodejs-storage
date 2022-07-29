@@ -20,11 +20,7 @@ import {
   SetMetadataResponse,
 } from './nodejs-common';
 import {SetMetadataOptions} from './nodejs-common/service-object';
-<<<<<<< HEAD
 import {IdempotencyStrategy, Storage} from './storage';
-=======
-import {Storage} from './storage';
->>>>>>> f58e8a5 (fix: implement setMetadata in HmacKey and fix associated tests)
 import {promisifyAll} from '@google-cloud/promisify';
 
 export interface HmacKeyOptions {
