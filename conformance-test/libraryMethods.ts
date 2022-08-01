@@ -249,6 +249,7 @@ export async function bucketMakePrivate(options: ConformanceTestOptions) {
 }
 
 export async function bucketMakePublic(options: ConformanceTestOptions) {
+  console.log("Making Public");
   await options.bucket!.makePublic();
 }
 

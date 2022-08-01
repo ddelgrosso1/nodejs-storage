@@ -862,6 +862,9 @@ export class Util {
       retries: autoRetryValue !== false ? maxRetryValue : 0,
       noResponseRetries: autoRetryValue !== false ? maxRetryValue : 0,
       shouldRetryFn(httpRespMessage: r.Response) {
+        console.log("SHOULD RETRY FN");
+        console.log(JSON.stringify(httpRespMessage));
+        console.log(httpRespMessage.statusCode);
         const err = util.parseHttpRespMessage(httpRespMessage).err;
         if (config.retryOptions?.retryableErrorFn) {
           return err && config.retryOptions?.retryableErrorFn(err);
@@ -883,6 +886,10 @@ export class Util {
         options,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (err: Error | null, response: {}, body: any) => {
+          console.log("IN HERE");
+          console.log(`Err: ${err}`);
+          console.log(`Response: ${JSON.stringify(response)}`);
+          console.log(`Body: ${JSON.stringify(body)}`);
           util.handleResp(err, response as {} as r.Response, body, callback!);
         }
       );

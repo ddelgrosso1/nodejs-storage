@@ -3374,18 +3374,18 @@ class Bucket extends ServiceObject {
         entity: 'allUsers',
         role: 'READER',
       })
-      .then(() => {
+      /* .then(() => {
         return this.acl.default!.add({
           entity: 'allUsers',
           role: 'READER',
         });
-      })
+      }) */
       .then(() => {
-        if (req.includeFiles) {
+        /* if (req.includeFiles) {
           return promisify<MakeAllFilesPublicPrivateOptions, File[]>(
             this.makeAllFilesPublicPrivate_
           ).call(this, req);
-        }
+        } */
         return [];
       })
       .then(files => callback!(null, files), callback);

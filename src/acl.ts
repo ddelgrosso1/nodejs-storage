@@ -514,8 +514,11 @@ class Acl extends AclRoleAccessorMethods {
           entity: options.entity,
           role: options.role.toUpperCase(),
         },
+        maxRetries: 0, //explicitly set this value since this is a non-idempotent function
       },
       (err, resp) => {
+        console.log(`Err: ${err}`);
+        console.log(`Response: ${JSON.stringify(resp)}`);
         if (err) {
           callback!(err, null, resp);
           return;
@@ -609,6 +612,7 @@ class Acl extends AclRoleAccessorMethods {
         method: 'DELETE',
         uri: '/' + encodeURIComponent(options.entity),
         qs: query,
+        maxRetries: 0, //explicitly set this value since this is a non-idempotent function
       },
       (err, resp) => {
         callback!(err, resp);
@@ -834,6 +838,7 @@ class Acl extends AclRoleAccessorMethods {
         json: {
           role: options.role.toUpperCase(),
         },
+        maxRetries: 0, //explicitly set this value since this is a non-idempotent function
       },
       (err, resp) => {
         if (err) {
