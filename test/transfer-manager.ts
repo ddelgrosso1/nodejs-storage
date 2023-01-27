@@ -16,8 +16,8 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {ServiceObject, ServiceObjectConfig, util} from '../src/nodejs-common';
-import * as pLimit from 'p-limit';
-import * as proxyquire from 'proxyquire';
+import pLimit from 'p-limit';
+import proxyquire from 'proxyquire';
 import {
   Bucket,
   CRC32C,
@@ -27,10 +27,10 @@ import {
   IdempotencyStrategy,
   UploadOptions,
 } from '../src';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as path from 'path';
 import * as stream from 'stream';
-import * as extend from 'extend';
+import extend from 'extend';
 import * as fs from 'fs';
 
 const fakeUtil = Object.assign({}, util);

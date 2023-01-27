@@ -15,7 +15,7 @@
  */
 import {promisifyAll} from '@google-cloud/promisify';
 import {EventEmitter} from 'events';
-import * as extend from 'extend';
+import extend from 'extend';
 import * as r from 'teeny-request';
 
 import {StreamRequestOptions} from '.';

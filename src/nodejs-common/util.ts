@@ -23,11 +23,11 @@ import {
   MissingProjectIdError,
 } from '@google-cloud/projectify';
 import * as ent from 'ent';
-import * as extend from 'extend';
+import extend from 'extend';
 import {AuthClient, GoogleAuth, GoogleAuthOptions} from 'google-auth-library';
 import {CredentialBody} from 'google-auth-library';
 import * as r from 'teeny-request';
-import * as retryRequest from 'retry-request';
+import retryRequest from 'retry-request';
 import {Duplex, DuplexOptions, Readable, Transform, Writable} from 'stream';
 import {teenyRequest} from 'teeny-request';
 import {Interceptor} from './service-object';
@@ -899,7 +899,7 @@ export class Util {
       dup.setReadable(requestStream);
     } else {
       // Streaming writable HTTP requests cannot be retried.
-      requestStream = options.request!(reqOpts);
+      requestStream = (options.request as unknown as Function)!(reqOpts);
       dup.setWritable(requestStream);
     }
 

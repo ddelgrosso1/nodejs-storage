@@ -19,14 +19,14 @@ import {
   ServiceObjectConfig,
   util,
 } from '../src/nodejs-common';
-import * as assert from 'assert';
-import * as extend from 'extend';
+import assert from 'assert';
+import extend from 'extend';
 import * as fs from 'fs';
 import {describe, it, before, beforeEach, after, afterEach} from 'mocha';
 import * as mime from 'mime-types';
-import pLimit = require('p-limit');
+import pLimit from 'p-limit';
 import * as path from 'path';
-import * as proxyquire from 'proxyquire';
+import proxyquire from 'proxyquire';
 
 import * as stream from 'stream';
 import {Bucket, Channel, Notification, CRC32C} from '../src';
@@ -48,7 +48,7 @@ import {
 } from '../src/bucket';
 import {AddAclOptions} from '../src/acl';
 import {Policy} from '../src/iam';
-import sinon = require('sinon');
+import * as sinon from 'sinon';
 import {Transform} from 'stream';
 import {ExceptionMessages, IdempotencyStrategy} from '../src/storage';
 import {convertObjKeysToSnakeCase} from '../src/util';

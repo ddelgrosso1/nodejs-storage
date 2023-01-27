@@ -14,7 +14,7 @@
 
 import AbortController from 'abort-controller';
 import {createHash} from 'crypto';
-import * as extend from 'extend';
+import extend from 'extend';
 import {
   GaxiosOptions,
   GaxiosPromise,
@@ -24,7 +24,7 @@ import {
 import * as gaxios from 'gaxios';
 import {GoogleAuth, GoogleAuthOptions} from 'google-auth-library';
 import {Readable, Writable} from 'stream';
-import retry = require('async-retry');
+import AsyncRetry from 'async-retry';
 import {RetryOptions, PreconditionOptions} from './storage';
 import * as uuid from 'uuid';
 
@@ -581,7 +581,7 @@ export class Upload extends Writable {
     if (this.origin) {
       reqOpts.headers!.Origin = this.origin;
     }
-    const uri = await retry(
+    const uri = await AsyncRetry(
       async (bail: (err: Error) => void) => {
         try {
           const res = await this.makeRequest(reqOpts);

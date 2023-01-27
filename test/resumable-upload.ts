@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {describe, it, beforeEach, before, afterEach, after} from 'mocha';
 import * as crypto from 'crypto';
 import * as mockery from 'mockery';
-import * as nock from 'nock';
+import nock from 'nock';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import {Readable, Writable} from 'stream';
@@ -93,7 +93,7 @@ describe('resumable-upload', () => {
   const keyFile = path.join(__dirname, '../../test/fixtures/keys.json');
 
   before(() => {
-    mockery.registerMock('abort-controller', {default: AbortController});
+    mockery.registerMock('abort-controller', AbortController);
     mockery.enable({useCleanCache: true, warnOnUnregistered: false});
     upload = require('../src/resumable-upload').upload;
   });

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as assert from 'assert';
+import assert from 'assert';
 import {describe, it, before, beforeEach, after, afterEach} from 'mocha';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import fetch from 'node-fetch';
-import * as FormData from 'form-data';
-import pLimit = require('p-limit');
+import FormData from 'form-data';
+import pLimit from 'p-limit';
 import {promisify} from 'util';
 import * as path from 'path';
 import * as tmp from 'tmp';
@@ -34,7 +34,7 @@ import {
   CRC32C,
   UploadOptions,
 } from '../src';
-import * as nock from 'nock';
+import nock from 'nock';
 import {Transform} from 'stream';
 import {gzipSync} from 'zlib';
 

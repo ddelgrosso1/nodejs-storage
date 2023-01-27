@@ -17,7 +17,6 @@
 import {execSync} from 'child_process';
 import {mkdirSync, mkdtempSync, unlinkSync} from 'fs';
 import * as path from 'path';
-import yargs = require('yargs');
 import {Bucket, Storage, TransferManager} from '../src';
 
 export const NODE_DEFAULT_HIGHWATER_MARK_BYTES = 16384;

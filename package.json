@@ -10,6 +10,7 @@
   "repository": "googleapis/nodejs-storage",
   "main": "./build/src/index.js",
   "types": "./build/src/index.d.ts",
+  "module": "./build/es/src/index.js",
   "files": [
     "build/src",
     "!build/src/**/*.map"

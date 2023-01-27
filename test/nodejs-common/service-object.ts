@@ -19,10 +19,10 @@ import {
   promisifyAll,
   PromisifyAllOptions,
 } from '@google-cloud/promisify';
-import * as assert from 'assert';
+import assert from 'assert';
 import {describe, it, beforeEach, afterEach} from 'mocha';
-import * as extend from 'extend';
-import * as proxyquire from 'proxyquire';
+import extend from 'extend';
+import proxyquire from 'proxyquire';
 import * as r from 'teeny-request';
 import * as sinon from 'sinon';
 import {Service} from '../../src/nodejs-common';

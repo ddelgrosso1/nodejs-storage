@@ -16,9 +16,9 @@
 
 import {Bucket, UploadOptions, UploadResponse} from './bucket';
 import {DownloadOptions, DownloadResponse, File} from './file';
-import * as pLimit from 'p-limit';
+import pLimit from 'p-limit';
 import * as path from 'path';
-import * as extend from 'extend';
+import extend from 'extend';
 import {promises as fsp} from 'fs';
 import {CRC32C} from './crc32c';
 
