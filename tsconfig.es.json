@@ -2,7 +2,7 @@
     "extends": "./node_modules/gts/tsconfig-google.json",
     "compilerOptions": {
         "rootDir": ".",
-        "outDir": "build/es",
+        "outDir": "build/esm",
         "resolveJsonModule": true,
         "module": "es2020",
         "target": "es2020",
@@ -11,10 +11,5 @@
     },
     "include": [
         "src/*.ts",
-        "test/**/*.ts",
-        "system-test/*.ts",
-        "conformance-test/*.ts",
-        "conformance-test/scenarios/*.ts",
-        "internal-tooling/*.ts"
     ]
 }
