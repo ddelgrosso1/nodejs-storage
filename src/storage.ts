@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ApiError, Metadata, Service, ServiceOptions} from './nodejs-common';
+import {ApiError, Metadata, Service, ServiceOptions} from './nodejs-common/index.js';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import {Readable} from 'stream';
 
-import {Bucket} from './bucket';
-import {Channel} from './channel';
-import {File} from './file';
-import {normalize} from './util';
-import {HmacKey, HmacKeyMetadata, HmacKeyOptions} from './hmacKey';
+import {Bucket} from './bucket.js';
+import {Channel} from './channel.js';
+import {File} from './file.js';
+import {normalize} from './util.js';
+import {HmacKey, HmacKeyMetadata, HmacKeyOptions} from './hmacKey.js';
 import {
   CRC32CValidatorGenerator,
   CRC32C_DEFAULT_VALIDATOR_GENERATOR,
-} from './crc32c';
+} from './crc32c.js';
 
 export interface GetServiceAccountOptions {
   userProject?: string;

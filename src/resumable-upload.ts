@@ -25,7 +25,7 @@ import * as gaxios from 'gaxios';
 import {GoogleAuth, GoogleAuthOptions} from 'google-auth-library';
 import {Readable, Writable} from 'stream';
 import AsyncRetry from 'async-retry';
-import {RetryOptions, PreconditionOptions} from './storage';
+import {RetryOptions, PreconditionOptions} from './storage.js';
 import * as uuid from 'uuid';
 
 const NOT_FOUND_STATUS_CODE = 404;

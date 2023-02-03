@@ -5,9 +5,10 @@
         "outDir": "build/esm",
         "resolveJsonModule": true,
         "module": "es2020",
-        "target": "es2020",
         "moduleResolution": "node",
         "esModuleInterop": true,
+        "lib": ["ES2020"],
+        "sourceMap": false
     },
     "include": [
         "src/*.ts",

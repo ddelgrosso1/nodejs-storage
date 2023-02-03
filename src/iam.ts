@@ -16,11 +16,11 @@ import {
   BodyResponseCallback,
   DecorateRequestOptions,
   Metadata,
-} from './nodejs-common';
+} from './nodejs-common/index.js';
 import {promisifyAll} from '@google-cloud/promisify';
 
-import {Bucket} from './bucket';
-import {normalize} from './util';
+import {Bucket} from './bucket.js';
+import {normalize} from './util.js';
 
 export interface GetPolicyOptions {
   userProject?: string;

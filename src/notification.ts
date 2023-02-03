@@ -18,11 +18,10 @@ import {
   MetadataCallback,
   ServiceObject,
   util,
-} from './nodejs-common';
-import {ResponseBody} from './nodejs-common/util';
+} from './nodejs-common/index.js';
+import {ResponseBody} from './nodejs-common/util.js';
 import {promisifyAll} from '@google-cloud/promisify';
-
-import {Bucket} from './bucket';
+import {Bucket} from './bucket.js';
 
 export interface DeleteNotificationOptions {
   userProject?: string;

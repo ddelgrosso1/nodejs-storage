@@ -30,14 +30,22 @@ import * as r from 'teeny-request';
 import retryRequest from 'retry-request';
 import {Duplex, DuplexOptions, Readable, Transform, Writable} from 'stream';
 import {teenyRequest} from 'teeny-request';
-import {Interceptor} from './service-object';
+import {Interceptor} from './service-object.js';
 import * as uuid from 'uuid';
-import {DEFAULT_PROJECT_ID_TOKEN} from './service';
+import {DEFAULT_PROJECT_ID_TOKEN} from './service.js';
+import * as fs from 'fs';
+import * as path from 'path';
+import {fileURLToPath} from 'url';
+import * as duplexify from 'duplexify';
 
-const packageJson = require('../../../package.json');
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const duplexify: DuplexifyConstructor = require('duplexify');
+// @ts-ignore
+const dirToUse = __dirname || import.meta.url;
+console.log(`HERE: ${dirToUse}`);
+const filename = fileURLToPath(dirToUse);
+const dirname = path.dirname(filename);
+const packageJson = JSON.parse(
+  fs.readFileSync(path.join(dirname, '..', '..', '..', '..', 'package.json')).toString()
+);
 
 const requestDefaults: r.CoreOptions = {
   timeout: 60000,
@@ -651,7 +659,7 @@ export class Util {
       let activeRequest_: void | Abortable | null;
 
       if (!optionsOrCallback) {
-        stream = duplexify();
+        stream = duplexify.default();
         reqConfig.stream = stream;
       }
 

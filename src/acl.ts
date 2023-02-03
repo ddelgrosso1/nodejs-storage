@@ -16,7 +16,7 @@ import {
   BodyResponseCallback,
   DecorateRequestOptions,
   Metadata,
-} from './nodejs-common';
+} from './nodejs-common/index.js';
 import {promisifyAll} from '@google-cloud/promisify';
 
 export interface AclOptions {

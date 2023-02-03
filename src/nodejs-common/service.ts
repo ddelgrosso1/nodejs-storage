@@ -18,14 +18,14 @@ import {AuthClient, GoogleAuth, GoogleAuthOptions} from 'google-auth-library';
 import * as r from 'teeny-request';
 import * as uuid from 'uuid';
 
-import {Interceptor} from './service-object';
+import {Interceptor} from './service-object.js';
 import {
   BodyResponseCallback,
   DecorateRequestOptions,
   MakeAuthenticatedRequest,
   PackageJson,
   util,
-} from './util';
+} from './util.js';
 
 export const DEFAULT_PROJECT_ID_TOKEN = '{{projectId}}';
 

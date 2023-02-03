@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import {Bucket, UploadOptions, UploadResponse} from './bucket';
-import {DownloadOptions, DownloadResponse, File} from './file';
+import {Bucket, UploadOptions, UploadResponse} from './bucket.js';
+import {DownloadOptions, DownloadResponse, File} from './file.js';
 import pLimit from 'p-limit';
 import * as path from 'path';
 import extend from 'extend';
 import {promises as fsp} from 'fs';
-import {CRC32C} from './crc32c';
+import {CRC32C} from './crc32c.js';
 
 /**
  * Default number of concurrently executing promises to use when calling uploadManyFiles.

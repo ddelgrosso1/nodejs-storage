@@ -25,7 +25,7 @@ import {
   ServiceObject,
   SetMetadataResponse,
   util,
-} from './nodejs-common';
+} from './nodejs-common/index.js';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import extend from 'extend';
@@ -36,18 +36,18 @@ import * as path from 'path';
 import pLimit from 'p-limit';
 import {promisify} from 'util';
 import AsyncRetry from 'async-retry';
-import {convertObjKeysToSnakeCase} from './util';
+import {convertObjKeysToSnakeCase} from './util.js';
 
-import {Acl} from './acl';
-import {Channel} from './channel';
+import {Acl} from './acl.js';
+import {Channel} from './channel.js';
 import {
   File,
   FileOptions,
   CreateResumableUploadOptions,
   CreateWriteStreamOptions,
-} from './file';
-import {Iam} from './iam';
-import {Notification} from './notification';
+} from './file.js';
+import {Iam} from './iam.js';
+import {Notification} from './notification.js';
 import {
   Storage,
   Cors,
@@ -55,18 +55,18 @@ import {
   IdempotencyStrategy,
   BucketOptions,
   ExceptionMessages,
-} from './storage';
+} from './storage.js';
 import {
   GetSignedUrlResponse,
   GetSignedUrlCallback,
   SignerGetSignedUrlConfig,
   URLSigner,
   Query,
-} from './signer';
+} from './signer.js';
 import {Readable} from 'stream';
-import {CRC32CValidatorGenerator} from './crc32c';
+import {CRC32CValidatorGenerator} from './crc32c.js';
 import {URL} from 'url';
-import {SetMetadataOptions} from './nodejs-common/service-object';
+import {SetMetadataOptions} from './nodejs-common/service-object.js';
 
 interface SourceObject {
   name: string;

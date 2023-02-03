@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-const yargs = require('yargs');
 import {appendFile} from 'fs/promises';
 // eslint-disable-next-line node/no-unsupported-features/node-builtins
 import {Worker} from 'worker_threads';
@@ -25,11 +24,12 @@ import {
   log,
   performanceTestCommand,
   PERFORMANCE_TEST_TYPES,
+  Arguments,
 } from './performanceUtils';
 
-const argv = yargs(process.argv.slice(2))
+const argv = yargs.default(process.argv.slice(2))
   .command(performanceTestCommand)
-  .parseSync();
+  .parseSync() as unknown as Arguments;
 
 let iterationsRemaining = argv.samples;
 

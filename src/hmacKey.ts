@@ -18,9 +18,9 @@ import {
   Methods,
   MetadataCallback,
   SetMetadataResponse,
-} from './nodejs-common';
-import {SetMetadataOptions} from './nodejs-common/service-object';
-import {IdempotencyStrategy, Storage} from './storage';
+} from './nodejs-common/index.js';
+import {SetMetadataOptions} from './nodejs-common/service-object.js';
+import {IdempotencyStrategy, Storage} from './storage.js';
 import {promisifyAll} from '@google-cloud/promisify';
 
 export interface HmacKeyOptions {

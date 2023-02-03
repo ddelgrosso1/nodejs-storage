@@ -134,9 +134,9 @@ export {
   UploadCallback,
   UploadOptions,
   UploadResponse,
-} from './bucket';
-export * from './crc32c';
-export {Channel, StopCallback} from './channel';
+} from './bucket.js';
+export * from './crc32c.js';
+export {Channel, StopCallback} from './channel.js';
 export {
   CopyCallback,
   CopyOptions,
@@ -196,8 +196,8 @@ export {
   SetStorageClassOptions,
   SetStorageClassResponse,
   SignedPostPolicyV4Output,
-} from './file';
-export * from './hash-stream-validator';
+} from './file.js';
+export * from './hash-stream-validator.js';
 export {
   HmacKey,
   HmacKeyMetadata,
@@ -205,7 +205,7 @@ export {
   HmacKeyMetadataResponse,
   SetHmacKeyMetadata,
   SetHmacKeyMetadataOptions,
-} from './hmacKey';
+} from './hmacKey.js';
 export {
   GetPolicyCallback,
   GetPolicyOptions,
@@ -218,7 +218,7 @@ export {
   TestIamPermissionsCallback,
   TestIamPermissionsOptions,
   TestIamPermissionsResponse,
-} from './iam';
+} from './iam.js';
 export {
   DeleteNotificationCallback,
   DeleteNotificationOptions,
@@ -229,7 +229,7 @@ export {
   GetNotificationOptions,
   GetNotificationResponse,
   Notification,
-} from './notification';
+} from './notification.js';
 export {
   BucketCallback,
   BucketOptions,
@@ -254,6 +254,6 @@ export {
   ServiceAccount,
   Storage,
   StorageOptions,
-} from './storage';
-export {GetSignedUrlCallback, GetSignedUrlResponse} from './signer';
-export * from './transfer-manager';
+} from './storage.js';
+export {GetSignedUrlCallback, GetSignedUrlResponse} from './signer.js';
+export * from './transfer-manager.js';

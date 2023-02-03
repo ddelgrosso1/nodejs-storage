@@ -25,7 +25,7 @@ import {
   DecorateRequestOptions,
   ResponseBody,
   util,
-} from './util';
+} from './util.js';
 
 export type RequestResponse = [Metadata, r.Response];
 

@@ -22,7 +22,7 @@ import {
   ServiceObject,
   SetMetadataResponse,
   util,
-} from './nodejs-common';
+} from './nodejs-common/index.js';
 import {promisifyAll} from '@google-cloud/promisify';
 
 import compressible from 'compressible';
@@ -30,7 +30,7 @@ import * as crypto from 'crypto';
 import extend from 'extend';
 import * as fs from 'fs';
 import * as mime from 'mime';
-import * as resumableUpload from './resumable-upload';
+import * as resumableUpload from './resumable-upload.js';
 import {Writable, Readable, pipeline, Transform, PassThrough} from 'stream';
 import * as zlib from 'zlib';
 import * as http from 'http';
@@ -40,9 +40,9 @@ import {
   IdempotencyStrategy,
   PreconditionOptions,
   Storage,
-} from './storage';
-import {AvailableServiceObjectMethods, Bucket} from './bucket';
-import {Acl} from './acl';
+} from './storage.js';
+import {AvailableServiceObjectMethods, Bucket} from './bucket.js';
+import {Acl} from './acl.js';
 import {
   GetSignedUrlResponse,
   SigningError,
@@ -50,13 +50,13 @@ import {
   URLSigner,
   SignerGetSignedUrlConfig,
   Query,
-} from './signer';
+} from './signer.js';
 import {
   ResponseBody,
   ApiError,
   Duplexify,
   DuplexifyConstructor,
-} from './nodejs-common/util';
+} from './nodejs-common/util.js';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const duplexify: DuplexifyConstructor = require('duplexify');
 import {
@@ -65,9 +65,9 @@ import {
   unicodeJSONStringify,
   formatAsUTCISO,
   PassThroughShim,
-} from './util';
-import {CRC32CValidatorGenerator} from './crc32c';
-import {HashStreamValidator} from './hash-stream-validator';
+} from './util.js';
+import {CRC32CValidatorGenerator} from './crc32c.js';
+import {HashStreamValidator} from './hash-stream-validator.js';
 import {URL} from 'url';
 
 import AsyncRetry from 'async-retry';
@@ -75,7 +75,7 @@ import {
   DeleteCallback,
   DeleteOptions,
   SetMetadataOptions,
-} from './nodejs-common/service-object';
+} from './nodejs-common/service-object.js';
 import * as r from 'teeny-request';
 
 export type GetExpirationDateResponse = [Date];
