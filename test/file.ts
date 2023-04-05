@@ -21,7 +21,7 @@ import {
   ServiceObject,
   ServiceObjectConfig,
   util,
-} from '../src/nodejs-common';
+} from '../src/nodejs-common/index.js';
 import {describe, it, before, beforeEach, afterEach} from 'mocha';
 import {PromisifyAllOptions} from '@google-cloud/promisify';
 import {Readable, PassThrough, Stream, Duplex, Transform} from 'stream';
@@ -31,10 +31,11 @@ import duplexify from 'duplexify';
 import extend from 'extend';
 import * as fs from 'fs';
 import proxyquire from 'proxyquire';
-import * as resumableUpload from '../src/resumable-upload';
+import * as resumableUpload from '../src/resumable-upload.js';
 import * as sinon from 'sinon';
 import * as tmp from 'tmp';
 import * as zlib from 'zlib';
+import * as os from 'os';
 
 import {
   Bucket,
@@ -46,17 +47,17 @@ import {
   GetSignedUrlConfig,
   GenerateSignedPostPolicyV2Options,
   CRC32C,
-} from '../src';
+} from '../src/index.js';
 import {
   SignedPostPolicyV4Output,
   GenerateSignedPostPolicyV4Options,
   STORAGE_POST_POLICY_BASE_URL,
   MoveOptions,
   FileExceptionMessages,
-} from '../src/file';
-import {ExceptionMessages, IdempotencyStrategy} from '../src/storage';
-import {formatAsUTCISO} from '../src/util';
-import {SetMetadataOptions} from '../src/nodejs-common/service-object';
+} from '../src/file.js';
+import {ExceptionMessages, IdempotencyStrategy} from '../src/storage.js';
+import {formatAsUTCISO} from '../src/util.js';
+import {SetMetadataOptions} from '../src/nodejs-common/service-object.js';
 
 class HTTPError extends Error {
   code: number;
@@ -117,7 +118,7 @@ const fakeZlib = extend(true, {}, zlib, {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const osCached = extend(true, {}, require('os'));
+const osCached = extend(true, {}, os);
 const fakeOs = extend(true, {}, osCached);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -763,7 +764,9 @@ describe('File', () => {
         ) => {
           file.copy = (newFile_: {}, options: {}, callback: Function) => {
             assert.strictEqual(newFile_, newFile);
-            assert.deepStrictEqual(options, {token: apiResponse.rewriteToken});
+            assert.deepStrictEqual(options, {
+              token: apiResponse.rewriteToken,
+            });
             callback(); // done()
           };
 
@@ -3484,7 +3487,9 @@ describe('File', () => {
             },
             () => {}
           ),
-            {message: 'Max allowed expiration is seven days (604800 seconds).'};
+            {
+              message: 'Max allowed expiration is seven days (604800 seconds).',
+            };
         });
       });
     });

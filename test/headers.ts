@@ -26,7 +26,7 @@ interface Request {
 
 describe('headers', () => {
   const requests: Request[] = [];
-  const {Storage} = proxyquire('../src', {
+  const {Storage} = proxyquire('../src/storage.js', {
     'google-auth-library': {
       GoogleAuth: class {
         async getProjectId() {

@@ -71,7 +71,9 @@ describe('resumable-upload', () => {
   let up: any;
 
   const BUCKET = 'bucket-name';
-  const CUSTOM_REQUEST_OPTIONS = {headers: {'X-My-Header': 'My custom value'}};
+  const CUSTOM_REQUEST_OPTIONS = {
+    headers: {'X-My-Header': 'My custom value'},
+  };
   const FILE = 'file-name';
   const GENERATION = Date.now();
   const METADATA = {contentLength: 1024, contentType: 'application/json'};
@@ -1629,7 +1631,9 @@ describe('resumable-upload', () => {
       up.userProject = 'user-project';
       up.authClient = {
         request: (reqOpts: GaxiosOptions) => {
-          assert.deepStrictEqual(reqOpts.params, {userProject: 'user-project'});
+          assert.deepStrictEqual(reqOpts.params, {
+            userProject: 'user-project',
+          });
           done();
         },
       };

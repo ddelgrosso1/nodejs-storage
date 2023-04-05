@@ -51,14 +51,8 @@ import {
   SignerGetSignedUrlConfig,
   Query,
 } from './signer.js';
-import {
-  ResponseBody,
-  ApiError,
-  Duplexify,
-  DuplexifyConstructor,
-} from './nodejs-common/util.js';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const duplexify: DuplexifyConstructor = require('duplexify');
+import {ResponseBody, ApiError, Duplexify} from './nodejs-common/util.js';
+import * as duplexify from 'duplexify';
 import {
   normalize,
   objectKeyToLowercase,
@@ -1917,7 +1911,7 @@ class File extends ServiceObject<File> {
       updateHashesOnly: true,
     });
 
-    const fileWriteStream = duplexify();
+    const fileWriteStream = duplexify.default();
     let fileWriteStreamMetadataReceived = false;
 
     // Handing off emitted events to users
@@ -1961,7 +1955,10 @@ class File extends ServiceObject<File> {
           }
 
           try {
-            await this.#validateIntegrity(hashCalculatingStream, {crc32c, md5});
+            await this.#validateIntegrity(hashCalculatingStream, {
+              crc32c,
+              md5,
+            });
             pipelineCallback();
           } catch (e) {
             pipelineCallback(e as Error);

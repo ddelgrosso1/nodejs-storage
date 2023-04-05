@@ -1,0 +1,15 @@
+{
+    "name": "@google-cloud/storage-samples",
+    "description": "Samples for the Cloud Storage Client Library for Node.js.",
+    "license": "Apache-2.0",
+    "author": "Google Inc.",
+    "engines": {
+      "node": ">=12"
+    },
+    "repository": "googleapis/nodejs-storage",
+    "private": true,
+    "files": [
+      "*.js"
+    ]
+  }
+  

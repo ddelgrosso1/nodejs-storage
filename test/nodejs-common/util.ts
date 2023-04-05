@@ -252,7 +252,9 @@ describe('common/util', () => {
 
       it('should use any inner errors', () => {
         const messages = ['Hi, I am an error!', 'Me too!'];
-        const errors: GoogleInnerError[] = messages.map(message => ({message}));
+        const errors: GoogleInnerError[] = messages.map(message => ({
+          message,
+        }));
         const error: GoogleErrorBody = {
           code: 100,
           response: {} as r.Response,

@@ -301,7 +301,9 @@ describe('Transfer Manager', () => {
         return Promise.resolve(new CRC32C(0));
       };
 
-      await transferManager.downloadFileInChunks(file, {validation: 'crc32c'});
+      await transferManager.downloadFileInChunks(file, {
+        validation: 'crc32c',
+      });
       assert.strictEqual(callCount, 1);
     });
   });

@@ -27,7 +27,8 @@ import {
   Arguments,
 } from './performanceUtils';
 
-const argv = yargs.default(process.argv.slice(2))
+const argv = yargs
+  .default(process.argv.slice(2))
   .command(performanceTestCommand)
   .parseSync() as unknown as Arguments;
 

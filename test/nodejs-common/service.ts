@@ -597,7 +597,10 @@ describe('Service', () => {
     });
 
     describe('request interceptors', () => {
-      type FakeRequestOptions = DecorateRequestOptions & {a: string; b: string};
+      type FakeRequestOptions = DecorateRequestOptions & {
+        a: string;
+        b: string;
+      };
 
       it('should include request interceptors', done => {
         const requestInterceptors = [

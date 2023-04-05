@@ -47,7 +47,7 @@
     "conformance-test": "mocha --parallel build/conformance-test/ --require build/conformance-test/globalHooks.js",
     "preconformance-test": "npm run compile",
     "presystem-test": "npm run compile",
-    "test": "c8 mocha build/test",
+    "test": "c8 mocha build/cjs/test",
     "pretest": "npm run compile",
     "lint": "gts check",
     "samples-test": "npm link && cd samples/ && npm link ../ && npm test && cd ../",

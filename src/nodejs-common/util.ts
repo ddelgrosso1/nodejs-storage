@@ -33,19 +33,10 @@ import {teenyRequest} from 'teeny-request';
 import {Interceptor} from './service-object.js';
 import * as uuid from 'uuid';
 import {DEFAULT_PROJECT_ID_TOKEN} from './service.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import {fileURLToPath} from 'url';
 import * as duplexify from 'duplexify';
+import {getPackageJSON} from '../util.js';
 
-// @ts-ignore
-const dirToUse = __dirname || import.meta.url;
-console.log(`HERE: ${dirToUse}`);
-const filename = fileURLToPath(dirToUse);
-const dirname = path.dirname(filename);
-const packageJson = JSON.parse(
-  fs.readFileSync(path.join(dirname, '..', '..', '..', '..', 'package.json')).toString()
-);
+const packageJson = getPackageJSON();
 
 const requestDefaults: r.CoreOptions = {
   timeout: 60000,

@@ -27,11 +27,12 @@ import {Readable, Writable} from 'stream';
 import AsyncRetry from 'async-retry';
 import {RetryOptions, PreconditionOptions} from './storage.js';
 import * as uuid from 'uuid';
+import {getPackageJSON} from './util.js';
 
 const NOT_FOUND_STATUS_CODE = 404;
 const RESUMABLE_INCOMPLETE_STATUS_CODE = 308;
 const DEFAULT_API_ENDPOINT_REGEX = /.*\.googleapis\.com/;
-const packageJson = require('../../package.json');
+const packageJson = getPackageJSON();
 
 export const PROTOCOL_REGEX = /^(\w*):\/\//;
 

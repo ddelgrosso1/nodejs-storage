@@ -57,6 +57,31 @@
  * Full quickstart example:
  */
 export {
+  BucketCallback,
+  BucketOptions,
+  CreateBucketQuery,
+  CreateBucketRequest,
+  CreateBucketResponse,
+  CreateHmacKeyCallback,
+  CreateHmacKeyOptions,
+  CreateHmacKeyResponse,
+  GetBucketsCallback,
+  GetBucketsRequest,
+  GetBucketsResponse,
+  GetHmacKeysCallback,
+  GetHmacKeysOptions,
+  GetHmacKeysResponse,
+  GetServiceAccountCallback,
+  GetServiceAccountOptions,
+  GetServiceAccountResponse,
+  HmacKeyResourceResponse,
+  IdempotencyStrategy,
+  PreconditionOptions,
+  ServiceAccount,
+  Storage,
+  StorageOptions,
+} from './storage.js';
+export {
   AccessControlObject,
   AclOptions,
   AddAclCallback,
@@ -230,30 +255,5 @@ export {
   GetNotificationResponse,
   Notification,
 } from './notification.js';
-export {
-  BucketCallback,
-  BucketOptions,
-  CreateBucketQuery,
-  CreateBucketRequest,
-  CreateBucketResponse,
-  CreateHmacKeyCallback,
-  CreateHmacKeyOptions,
-  CreateHmacKeyResponse,
-  GetBucketsCallback,
-  GetBucketsRequest,
-  GetBucketsResponse,
-  GetHmacKeysCallback,
-  GetHmacKeysOptions,
-  GetHmacKeysResponse,
-  GetServiceAccountCallback,
-  GetServiceAccountOptions,
-  GetServiceAccountResponse,
-  HmacKeyResourceResponse,
-  IdempotencyStrategy,
-  PreconditionOptions,
-  ServiceAccount,
-  Storage,
-  StorageOptions,
-} from './storage.js';
 export {GetSignedUrlCallback, GetSignedUrlResponse} from './signer.js';
 export * from './transfer-manager.js';

@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ApiError, Metadata, Service, ServiceOptions} from './nodejs-common/index.js';
+import {
+  ApiError,
+  Metadata,
+  Service,
+  ServiceOptions,
+} from './nodejs-common/index.js';
 import {paginator} from '@google-cloud/paginator';
 import {promisifyAll} from '@google-cloud/promisify';
 import {Readable} from 'stream';
@@ -20,7 +25,7 @@ import {Readable} from 'stream';
 import {Bucket} from './bucket.js';
 import {Channel} from './channel.js';
 import {File} from './file.js';
-import {normalize} from './util.js';
+import {getPackageJSON, normalize} from './util.js';
 import {HmacKey, HmacKeyMetadata, HmacKeyOptions} from './hmacKey.js';
 import {
   CRC32CValidatorGenerator,
@@ -742,7 +747,7 @@ export class Storage extends Service {
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/devstorage.full_control',
       ],
-      packageJson: require('../../package.json'),
+      packageJson: getPackageJSON(),
     };
 
     super(config, options);

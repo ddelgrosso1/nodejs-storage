@@ -18,7 +18,7 @@ import {
   ServiceObject,
   ServiceObjectConfig,
   util,
-} from '../src/nodejs-common';
+} from '../src/nodejs-common/index.js';
 import assert from 'assert';
 import extend from 'extend';
 import * as fs from 'fs';
@@ -29,13 +29,13 @@ import * as path from 'path';
 import proxyquire from 'proxyquire';
 
 import * as stream from 'stream';
-import {Bucket, Channel, Notification, CRC32C} from '../src';
+import {Bucket, Channel, Notification, CRC32C} from '../src/index.js';
 import {
   CreateWriteStreamOptions,
   File,
   SetFileMetadataOptions,
   FileOptions,
-} from '../src/file';
+} from '../src/file.js';
 import {PromisifyAllOptions} from '@google-cloud/promisify';
 import {
   GetBucketMetadataCallback,
@@ -45,13 +45,14 @@ import {
   GetBucketSignedUrlConfig,
   AvailableServiceObjectMethods,
   BucketExceptionMessages,
-} from '../src/bucket';
-import {AddAclOptions} from '../src/acl';
-import {Policy} from '../src/iam';
+} from '../src/bucket.js';
+import {AddAclOptions} from '../src/acl.js';
+import {Policy} from '../src/iam.js';
 import * as sinon from 'sinon';
 import {Transform} from 'stream';
-import {ExceptionMessages, IdempotencyStrategy} from '../src/storage';
-import {convertObjKeysToSnakeCase} from '../src/util';
+import {ExceptionMessages, IdempotencyStrategy} from '../src/storage.js';
+import {convertObjKeysToSnakeCase} from '../src/util.js';
+import {fileURLToPath} from 'url';
 
 class FakeFile {
   calledWith_: IArguments;
@@ -2649,9 +2650,17 @@ describe('Bucket', () => {
 
   describe('upload', () => {
     const basename = 'testfile.json';
-    const filepath = path.join(__dirname, '../../test/testdata/' + basename);
+    const filepath = path.join(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      path.dirname(fileURLToPath(import.meta.url)),
+      '../../test/testdata/',
+      basename
+    );
     const nonExistentFilePath = path.join(
-      __dirname,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      path.dirname(fileURLToPath(import.meta.url)),
       '../../test/testdata/',
       'non-existent-file'
     );
