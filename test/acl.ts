@@ -19,7 +19,7 @@ import {
 } from '../src/nodejs-common/index.js';
 import assert from 'assert';
 import {describe, it, before, beforeEach} from 'mocha';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 import {Storage} from '../src/storage.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,8 +45,8 @@ describe('storage/acl', () => {
   const ROLE = Storage.acl.OWNER_ROLE;
   const ENTITY = 'user-user@example.com';
 
-  before(() => {
-    const aclModule = proxyquire('../src/acl.js', {
+  before(async () => {
+    const aclModule = await esmock('../src/acl.js', {
       '@google-cloud/promisify': fakePromisify,
     });
     Acl = aclModule.Acl;

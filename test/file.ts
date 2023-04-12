@@ -30,7 +30,7 @@ import * as crypto from 'crypto';
 import duplexify from 'duplexify';
 import extend from 'extend';
 import * as fs from 'fs';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 import * as resumableUpload from '../src/resumable-upload.js';
 import * as sinon from 'sinon';
 import * as tmp from 'tmp';
@@ -161,7 +161,7 @@ class FakeServiceObject extends ServiceObject {
 }
 
 const fakeSigner = {
-  URLSigner: () => {},
+  URLSigner: function () {},
 };
 
 describe('File', () => {
@@ -195,19 +195,21 @@ describe('File', () => {
   //crc32c hash of `GZIPPED_DATA`
   const CRC32C_HASH_GZIP = '64jygg==';
 
-  before(() => {
-    File = proxyquire('../src/file.js', {
-      './nodejs-common': {
-        ServiceObject: FakeServiceObject,
-        util: fakeUtil,
-      },
-      '@google-cloud/promisify': fakePromisify,
-      fs: fakeFs,
-      '../src/resumable-upload': fakeResumableUpload,
-      os: fakeOs,
-      './signer': fakeSigner,
-      zlib: fakeZlib,
-    }).File;
+  before(async () => {
+    File = (
+      await esmock('../src/file.js', {
+        '../src/nodejs-common/index.js': {
+          ServiceObject: FakeServiceObject,
+          util: fakeUtil,
+        },
+        '@google-cloud/promisify': fakePromisify,
+        fs: fakeFs,
+        '../src/resumable-upload.js': fakeResumableUpload,
+        os: fakeOs,
+        '../src/signer.js': fakeSigner,
+        zlib: fakeZlib,
+      })
+    ).File;
   });
 
   beforeEach(() => {
@@ -3505,7 +3507,7 @@ describe('File', () => {
     let urlSignerStub: sinon.SinonStub;
     let SIGNED_URL_CONFIG: GetSignedUrlConfig;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       sandbox = sinon.createSandbox();
 
       signerGetSignedUrlStub = sandbox.stub().resolves(EXPECTED_SIGNED_URL);
@@ -3519,12 +3521,28 @@ describe('File', () => {
         signer
       );
 
+      File = (
+        await esmock('../src/file.js', {
+          '../src/nodejs-common/index.js': {
+            ServiceObject: FakeServiceObject,
+            util: fakeUtil,
+          },
+          '@google-cloud/promisify': fakePromisify,
+          fs: fakeFs,
+          '../src/resumable-upload.js': fakeResumableUpload,
+          os: fakeOs,
+          '../src/signer.js': fakeSigner,
+          zlib: fakeZlib,
+        })
+      ).File;
+
       SIGNED_URL_CONFIG = {
         version: 'v4',
         expires: new Date(),
         action: 'read',
         cname: CNAME,
       };
+      file = new File(BUCKET, FILE_NAME);
     });
 
     afterEach(() => sandbox.restore());

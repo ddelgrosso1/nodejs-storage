@@ -14,7 +14,7 @@
 
 import assert from 'assert';
 import {describe, it} from 'mocha';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 
 const error = Error('not implemented');
 
@@ -24,9 +24,9 @@ interface Request {
   };
 }
 
-describe('headers', () => {
+describe('headers', async () => {
   const requests: Request[] = [];
-  const {Storage} = proxyquire('../src/storage.js', {
+  const {Storage} = await esmock('../src/storage.js', {
     'google-auth-library': {
       GoogleAuth: class {
         async getProjectId() {

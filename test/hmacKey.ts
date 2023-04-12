@@ -13,11 +13,11 @@
 // limitations under the License.
 
 import * as sinon from 'sinon';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 import assert from 'assert';
 import {describe, it, beforeEach, afterEach} from 'mocha';
-import {util, ServiceObject, Metadata} from '../src/nodejs-common';
-import {IdempotencyStrategy} from '../src';
+import {util, ServiceObject, Metadata} from '../src/nodejs-common/index.js';
+import {IdempotencyStrategy} from '../src/index.js';
 
 const sandbox = sinon.createSandbox();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,13 +46,15 @@ describe('HmacKey', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let HmacKey: any;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       commonModule = {ServiceObject};
       serviceObjectSpy = sandbox.spy(commonModule, 'ServiceObject');
 
-      HmacKey = proxyquire('../src/hmacKey', {
-        './nodejs-common': commonModule,
-      }).HmacKey;
+      HmacKey = (
+        await esmock('../src/hmacKey.js', {
+          '../src/nodejs-common/index.js': commonModule,
+        })
+      ).HmacKey;
 
       STORAGE = {
         request: util.noop,

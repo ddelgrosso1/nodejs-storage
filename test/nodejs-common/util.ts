@@ -28,7 +28,7 @@ import {
   OAuth2Client,
 } from 'google-auth-library';
 import nock from 'nock';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 import * as r from 'teeny-request';
 import retryRequest from 'retry-request';
 import * as sinon from 'sinon';
@@ -40,18 +40,15 @@ import {
   ApiError,
   DecorateRequestOptions,
   Duplexify,
-  DuplexifyConstructor,
   GoogleErrorBody,
   GoogleInnerError,
   MakeAuthenticatedRequestFactoryConfig,
   MakeRequestConfig,
   ParsedHttpRespMessage,
   Util,
-} from '../../src/nodejs-common/util';
-import {DEFAULT_PROJECT_ID_TOKEN} from '../../src/nodejs-common/service';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const duplexify: DuplexifyConstructor = require('duplexify');
+} from '../../src/nodejs-common/util.js';
+import {DEFAULT_PROJECT_ID_TOKEN} from '../../src/nodejs-common/service.js';
+import duplexify from 'duplexify';
 
 nock.disableNetConnect();
 
@@ -146,15 +143,17 @@ describe('common/util', () => {
     },
   };
 
-  before(() => {
-    util = proxyquire('../../src/nodejs-common/util', {
-      'google-auth-library': fakeGoogleAuth,
-      'retry-request': fakeRetryRequest,
-      'teeny-request': {teenyRequest: fakeRequest},
-      '@google-cloud/projectify': {
-        replaceProjectIdToken: fakeReplaceProjectIdToken,
-      },
-    }).util;
+  before(async () => {
+    util = (
+      await esmock('../../src/nodejs-common/util.js', {
+        'google-auth-library': fakeGoogleAuth,
+        'retry-request': fakeRetryRequest,
+        'teeny-request': {teenyRequest: fakeRequest},
+        '@google-cloud/projectify': {
+          replaceProjectIdToken: fakeReplaceProjectIdToken,
+        },
+      })
+    ).util;
   });
 
   let sandbox: sinon.SinonSandbox;
@@ -729,16 +728,32 @@ describe('common/util', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
+    let authStub: sinon.SinonStub;
+
+    beforeEach(async () => {
+      authStub = sandbox
+        .stub(fakeGoogleAuth, 'GoogleAuth')
+        .returns({getCredentials: new Function()});
+
+      util = (
+        await esmock('../../src/nodejs-common/util.js', {
+          'google-auth-library': fakeGoogleAuth,
+          'retry-request': fakeRetryRequest,
+          'teeny-request': {teenyRequest: fakeRequest},
+          '@google-cloud/projectify': {
+            replaceProjectIdToken: fakeReplaceProjectIdToken,
+          },
+        })
+      ).util;
+    });
+
     it('should create an authClient', done => {
       const config = {test: true} as MakeAuthenticatedRequestFactoryConfig;
-
-      sandbox
-        .stub(fakeGoogleAuth, 'GoogleAuth')
-        .callsFake((config_: GoogleAuthOptions) => {
-          assert.deepStrictEqual(config_, {...config, authClient: undefined});
-          setImmediate(done);
-          return authClient;
-        });
+      authStub.callsFake((config_: GoogleAuthOptions) => {
+        assert.deepStrictEqual(config_, {...config, authClient: undefined});
+        setImmediate(done);
+        return authClient;
+      });
 
       util.makeAuthenticatedRequestFactory(config);
     });
@@ -750,13 +765,11 @@ describe('common/util', () => {
         authClient: customAuthClient,
       };
 
-      sandbox
-        .stub(fakeGoogleAuth, 'GoogleAuth')
-        .callsFake((config_: GoogleAuthOptions) => {
-          assert.deepStrictEqual(config_, config);
-          setImmediate(done);
-          return authClient;
-        });
+      authStub.callsFake((config_: GoogleAuthOptions) => {
+        assert.deepStrictEqual(config_, config);
+        setImmediate(done);
+        return authClient;
+      });
 
       util.makeAuthenticatedRequestFactory(config);
     });
@@ -764,7 +777,7 @@ describe('common/util', () => {
     it('should not pass projectId token to google-auth-library', done => {
       const config = {projectId: DEFAULT_PROJECT_ID_TOKEN};
 
-      sandbox.stub(fakeGoogleAuth, 'GoogleAuth').callsFake(config_ => {
+      authStub.callsFake(config_ => {
         assert.strictEqual(config_.projectId, undefined);
         setImmediate(done);
         return authClient;
@@ -776,7 +789,7 @@ describe('common/util', () => {
     it('should not remove projectId from config object', done => {
       const config = {projectId: DEFAULT_PROJECT_ID_TOKEN};
 
-      sandbox.stub(fakeGoogleAuth, 'GoogleAuth').callsFake(() => {
+      authStub.callsFake(() => {
         assert.strictEqual(config.projectId, DEFAULT_PROJECT_ID_TOKEN);
         setImmediate(done);
         return authClient;
@@ -797,7 +810,7 @@ describe('common/util', () => {
         done();
       }
 
-      sandbox.stub(fakeGoogleAuth, 'GoogleAuth').callsFake(() => {
+      authStub.callsFake(() => {
         return {getCredentials};
       });
 
@@ -807,7 +820,7 @@ describe('common/util', () => {
 
     it('should return the authClient', () => {
       const authClient = {getCredentials() {}};
-      sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+      authStub.returns(authClient);
       const mar = util.makeAuthenticatedRequestFactory({});
       assert.strictEqual(mar.authClient, authClient);
     });
@@ -818,7 +831,7 @@ describe('common/util', () => {
       const config = {customEndpoint: true};
 
       beforeEach(() => {
-        sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+        authStub.returns(authClient);
         makeAuthenticatedRequest = util.makeAuthenticatedRequestFactory(config);
       });
 
@@ -886,7 +899,7 @@ describe('common/util', () => {
       const config = {customEndpoint: true, useAuthWithCustomEndpoint: true};
 
       beforeEach(() => {
-        sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+        authStub.returns(authClient);
         makeAuthenticatedRequest = util.makeAuthenticatedRequestFactory(config);
       });
 
@@ -919,13 +932,13 @@ describe('common/util', () => {
         retryRequestOverride = () => {
           return new stream.PassThrough();
         };
-        sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(fake);
+        authStub.returns(fake);
         const mar = util.makeAuthenticatedRequestFactory({});
         mar(fakeReqOpts);
       });
 
       it('should return a stream if callback is missing', () => {
-        sandbox.stub(fakeGoogleAuth, 'GoogleAuth').callsFake(() => {
+        authStub.callsFake(() => {
           return extend(true, authClient, {
             authorizeRequest: async (rOpts: {}) => {
               return rOpts;
@@ -944,7 +957,7 @@ describe('common/util', () => {
         const reqOpts = {} as DecorateRequestOptions;
 
         it('should default to authClient projectId', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           stub('decorateRequest', (reqOpts, projectId) => {
             assert.strictEqual(projectId, AUTH_CLIENT_PROJECT_ID);
             setImmediate(done);
@@ -960,7 +973,7 @@ describe('common/util', () => {
         });
 
         it('should prefer user-provided projectId', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
 
           const config = {
             customEndpoint: true,
@@ -983,7 +996,7 @@ describe('common/util', () => {
         it('should use default `projectId` and not call `authClient#getProjectId` when !`projectIdRequired`', done => {
           const getProjectIdSpy = sandbox.spy(authClient, 'getProjectId');
 
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
 
           const config = {
             customEndpoint: true,
@@ -1009,7 +1022,7 @@ describe('common/util', () => {
         it('should fallback to checking for a `projectId` on when missing a `projectId` when !`projectIdRequired`', done => {
           const getProjectIdSpy = sandbox.spy(authClient, 'getProjectId');
 
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
 
           const config = {
             customEndpoint: true,
@@ -1050,7 +1063,7 @@ describe('common/util', () => {
         });
 
         it('should attempt request anyway', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           const makeAuthenticatedRequest = util.makeAuthenticatedRequestFactory(
             {}
           );
@@ -1079,7 +1092,7 @@ describe('common/util', () => {
           authClient.authorizeRequest = async () => {
             throw authClientError;
           };
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
 
           const makeRequestArg1 = new Error('API 401 Error.') as ApiError;
           makeRequestArg1.code = 401;
@@ -1107,7 +1120,7 @@ describe('common/util', () => {
           authClient.authorizeRequest = async () => {
             return {};
           };
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
 
           const makeRequestArg1 = new Error('API 401 Error.') as ApiError;
           makeRequestArg1.code = 401;
@@ -1133,7 +1146,7 @@ describe('common/util', () => {
 
         it('should block decorateRequest error', done => {
           const decorateRequestError = new Error('Error.');
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           stub('decorateRequest', () => {
             throw decorateRequestError;
           });
@@ -1151,7 +1164,7 @@ describe('common/util', () => {
         });
 
         it('should invoke the callback with error', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           const mar = util.makeAuthenticatedRequestFactory({});
           mar(fakeReqOpts, err => {
             assert.strictEqual(err, error);
@@ -1160,7 +1173,7 @@ describe('common/util', () => {
         });
 
         it('should exec onAuthenticated callback with error', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           const mar = util.makeAuthenticatedRequestFactory({});
           mar(fakeReqOpts, {
             onAuthenticated(err) {
@@ -1171,7 +1184,7 @@ describe('common/util', () => {
         });
 
         it('should emit an error and end the stream', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           const mar = util.makeAuthenticatedRequestFactory({});
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const stream = mar(fakeReqOpts) as any;
@@ -1192,7 +1205,7 @@ describe('common/util', () => {
         });
 
         it('should return authenticated request to callback', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           stub('decorateRequest', reqOpts_ => {
             assert.deepStrictEqual(reqOpts_, reqOpts);
             return reqOpts;
@@ -1208,7 +1221,7 @@ describe('common/util', () => {
         });
 
         it('should make request with correct options', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           const config = {keyFile: 'foo'};
           stub('decorateRequest', reqOpts_ => {
             assert.deepStrictEqual(reqOpts_, reqOpts);
@@ -1224,7 +1237,7 @@ describe('common/util', () => {
         });
 
         it('should return abort() from the active request', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           const retryRequest = {
             abort: done,
           };
@@ -1235,7 +1248,7 @@ describe('common/util', () => {
         });
 
         it('should only abort() once', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           const retryRequest = {
             abort: done, // Will throw if called more than once.
           };
@@ -1254,7 +1267,7 @@ describe('common/util', () => {
         });
 
         it('should provide stream to makeRequest', done => {
-          sandbox.stub(fakeGoogleAuth, 'GoogleAuth').returns(authClient);
+          authStub.returns(authClient);
           stub('makeRequest', (authenticatedReqOpts, cfg) => {
             setImmediate(() => {
               assert.strictEqual(cfg.stream, stream);

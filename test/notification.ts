@@ -17,12 +17,11 @@ import {
   ServiceObject,
   ServiceObjectConfig,
   util,
-} from '../src/nodejs-common';
+} from '../src/nodejs-common/index.js';
 import assert from 'assert';
 import {describe, it, before, beforeEach} from 'mocha';
-import proxyquire from 'proxyquire';
-
-import {Bucket} from '../src';
+import esmock from 'esmock';
+import {Bucket} from '../src/bucket.js';
 
 class FakeServiceObject extends ServiceObject {
   calledWith_: IArguments;
@@ -55,14 +54,16 @@ describe('Notification', () => {
 
   const ID = '123';
 
-  before(() => {
-    Notification = proxyquire('../src/notification.js', {
-      '@google-cloud/promisify': fakePromisify,
-      './nodejs-common': {
-        ServiceObject: FakeServiceObject,
-        util: fakeUtil,
-      },
-    }).Notification;
+  before(async () => {
+    Notification = (
+      await esmock('../src/notification.js', {
+        '@google-cloud/promisify': fakePromisify,
+        '../src/nodejs-common/index.js': {
+          ServiceObject: FakeServiceObject,
+          util: fakeUtil,
+        },
+      })
+    ).Notification;
   });
 
   beforeEach(() => {

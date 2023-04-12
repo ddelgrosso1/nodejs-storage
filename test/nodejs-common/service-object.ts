@@ -22,11 +22,34 @@ import {
 import assert from 'assert';
 import {describe, it, beforeEach, afterEach} from 'mocha';
 import extend from 'extend';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 import * as r from 'teeny-request';
 import * as sinon from 'sinon';
-import {Service} from '../../src/nodejs-common';
-import * as SO from '../../src/nodejs-common/service-object';
+import {Service} from '../../src/nodejs-common/index.js';
+import * as SO from '../../src/nodejs-common/service-object.js';
+import {
+  ApiError,
+  BodyResponseCallback,
+  DecorateRequestOptions,
+  util,
+} from '../../src/nodejs-common/util.js';
+import {RequestResponse} from '../../src/nodejs-common/service-object.js';
+
+let ServiceObject: {
+  prototype: {
+    request(
+      reqOpts: DecorateRequestOptions,
+      callback: BodyResponseCallback
+    ): void | Promise<RequestResponse>;
+    get(
+      options: SO.GetConfig & SO.CreateOptions,
+      callback: SO.InstanceResponseCallback<r.Response>
+    ): void | Promise<SO.GetResponse<r.Response>>;
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+  new (config: SO.ServiceObjectConfig): SO.ServiceObject;
+};
 
 let promisified = false;
 const fakePromisify = {
@@ -40,16 +63,6 @@ const fakePromisify = {
     return promisifyAll(Class, options);
   },
 };
-const ServiceObject = proxyquire('../../src/nodejs-common/service-object', {
-  '@google-cloud/promisify': fakePromisify,
-}).ServiceObject;
-
-import {
-  ApiError,
-  BodyResponseCallback,
-  DecorateRequestOptions,
-  util,
-} from '../../src/nodejs-common/util';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FakeServiceObject = any;
@@ -77,6 +90,14 @@ describe('ServiceObject', () => {
     id: 'id',
     createMethod: util.noop,
   };
+
+  before(async () => {
+    ServiceObject = (
+      await esmock('../../src/nodejs-common/service-object.js', {
+        '@google-cloud/promisify': fakePromisify,
+      })
+    ).ServiceObject;
+  });
 
   beforeEach(() => {
     serviceObject = new ServiceObject(CONFIG);
@@ -292,7 +313,7 @@ describe('ServiceObject', () => {
     it('should make the correct request', done => {
       sandbox
         .stub(ServiceObject.prototype, 'request')
-        .callsFake((reqOpts, callback) => {
+        .callsFake((reqOpts: DecorateRequestOptions, callback) => {
           assert.strictEqual(reqOpts.method, 'DELETE');
           assert.strictEqual(reqOpts.uri, '');
           done();

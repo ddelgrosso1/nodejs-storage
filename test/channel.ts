@@ -23,7 +23,7 @@ import {
 } from '../src/nodejs-common/index.js';
 import assert from 'assert';
 import {describe, it, before, beforeEach} from 'mocha';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 
 let promisified = false;
 const fakePromisify = {
@@ -53,13 +53,15 @@ describe('Channel', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let channel: any;
 
-  before(() => {
-    Channel = proxyquire('../src/channel.js', {
-      '@google-cloud/promisify': fakePromisify,
-      './nodejs-common': {
-        ServiceObject: FakeServiceObject,
-      },
-    }).Channel;
+  before(async () => {
+    Channel = (
+      await esmock('../src/channel.js', {
+        '@google-cloud/promisify': fakePromisify,
+        '../src/nodejs-common/index.js': {
+          ServiceObject: FakeServiceObject,
+        },
+      })
+    ).Channel;
   });
 
   beforeEach(() => {

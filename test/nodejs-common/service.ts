@@ -17,16 +17,16 @@
 import assert from 'assert';
 import {describe, it, before, beforeEach, after} from 'mocha';
 import extend from 'extend';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 import {Request} from 'teeny-request';
 import {AuthClient, GoogleAuth, OAuth2Client} from 'google-auth-library';
 
-import {Interceptor} from '../../src/nodejs-common';
+import {Interceptor} from '../../src/nodejs-common/index.js';
 import {
   DEFAULT_PROJECT_ID_TOKEN,
   ServiceConfig,
   ServiceOptions,
-} from '../../src/nodejs-common/service';
+} from '../../src/nodejs-common/service.js';
 import {
   BodyResponseCallback,
   DecorateRequestOptions,
@@ -34,9 +34,7 @@ import {
   MakeAuthenticatedRequestFactoryConfig,
   util,
   Util,
-} from '../../src/nodejs-common/util';
-
-proxyquire.noPreserveCache();
+} from '../../src/nodejs-common/util.js';
 
 const fakeCfg = {} as ServiceConfig;
 
@@ -57,12 +55,14 @@ util.makeAuthenticatedRequestFactory = function (
   return makeAuthRequestFactoryCache.call(this, config);
 };
 
-describe('Service', () => {
+describe('Service', async () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let service: any;
-  const Service = proxyquire('../../src/nodejs-common/service', {
-    './util': util,
-  }).Service;
+  const Service = (
+    await esmock('../../src/nodejs-common/service.js', {
+      '../../src/nodejs-common/util.js': util,
+    })
+  ).Service;
 
   const CONFIG = {
     scopes: [],

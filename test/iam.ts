@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {DecorateRequestOptions, util} from '../src/nodejs-common';
+import {DecorateRequestOptions, util} from '../src/nodejs-common/index.js';
 import assert from 'assert';
+import esmock from 'esmock';
 import {describe, it, before, beforeEach} from 'mocha';
-import proxyquire from 'proxyquire';
-import {IAMExceptionMessages} from '../src/iam';
+import {IAMExceptionMessages} from '../src/iam.js';
 
 describe('storage/iam', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,10 +36,12 @@ describe('storage/iam', () => {
     },
   };
 
-  before(() => {
-    Iam = proxyquire('../src/iam.js', {
-      '@google-cloud/promisify': fakePromisify,
-    }).Iam;
+  before(async () => {
+    Iam = (
+      await esmock('../src/iam.js', {
+        '@google-cloud/promisify': fakePromisify,
+      })
+    ).Iam;
   });
 
   beforeEach(() => {

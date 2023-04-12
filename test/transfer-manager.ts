@@ -15,9 +15,13 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {ServiceObject, ServiceObjectConfig, util} from '../src/nodejs-common';
+import {
+  ServiceObject,
+  ServiceObjectConfig,
+  util,
+} from '../src/nodejs-common/index.js';
 import pLimit from 'p-limit';
-import proxyquire from 'proxyquire';
+import esmock from 'esmock';
 import {
   Bucket,
   CRC32C,
@@ -26,12 +30,13 @@ import {
   FileOptions,
   IdempotencyStrategy,
   UploadOptions,
-} from '../src';
+} from '../src/index.js';
 import assert from 'assert';
 import * as path from 'path';
 import * as stream from 'stream';
 import extend from 'extend';
 import * as fs from 'fs';
+import {fileURLToPath} from 'url';
 
 const fakeUtil = Object.assign({}, util);
 fakeUtil.noop = util.noop;
@@ -137,35 +142,40 @@ describe('Transfer Manager', () => {
   };
   const BUCKET_NAME = 'test-bucket';
 
-  before(() => {
-    Bucket = proxyquire('../src/bucket.js', {
-      'p-limit': fakePLimit,
-      './nodejs-common': {
-        ServiceObject: FakeServiceObject,
-        util: fakeUtil,
-      },
-      './acl.js': {Acl: FakeAcl},
-      './file.js': {File: FakeFile},
-    }).Bucket;
+  before(async () => {
+    Bucket = (
+      await esmock('../src/bucket.js', {
+        'p-limit': fakePLimit,
+        '../src/nodejs-common/index.js': {
+          ServiceObject: FakeServiceObject,
+          util: fakeUtil,
+        },
+        '../src/acl.js': {Acl: FakeAcl},
+        '../src/file.js': {File: FakeFile},
+      })
+    ).Bucket;
 
-    File = proxyquire('../src/file.js', {
-      './nodejs-common': {
-        ServiceObject: FakeServiceObject,
-        util: fakeUtil,
-      },
-    }).File;
+    File = (
+      await esmock('../src/file.js', {
+        '../src/nodejs-common/index.js': {
+          ServiceObject: FakeServiceObject,
+          util: fakeUtil,
+        },
+      })
+    ).File;
 
-    TransferManager = proxyquire('../src/transfer-manager.js', {
-      'p-limit': fakePLimit,
-      './nodejs-common': {
-        ServiceObject: FakeServiceObject,
-        util: fakeUtil,
-      },
-      './acl.js': {Acl: FakeAcl},
-      './file.js': {File: FakeFile},
-      fs: fakeFs,
-      fsp: fakeFs,
-    }).TransferManager;
+    TransferManager = (
+      await esmock('../src/transfer-manager.js', {
+        'p-limit': fakePLimit,
+        '../src/nodejs-common/index.js': {
+          ServiceObject: FakeServiceObject,
+          util: fakeUtil,
+        },
+        '../src/acl.js': {Acl: FakeAcl},
+        '../src/file.js': {File: FakeFile},
+        fs: fakeFs,
+      })
+    ).TransferManager;
   });
 
   beforeEach(() => {
@@ -215,7 +225,14 @@ describe('Transfer Manager', () => {
     });
 
     it('returns a promise with the uploaded file if there is no callback', async () => {
-      const paths = [path.join(__dirname, '../../test/testdata/testfile.json')];
+      const paths = [
+        path.join(
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          path.dirname(fileURLToPath(import.meta.url)),
+          '../../../test/testdata/testfile.json'
+        ),
+      ];
       const result = await transferManager.uploadManyFiles(paths);
       assert.strictEqual(result[0][0].name, paths[0]);
     });

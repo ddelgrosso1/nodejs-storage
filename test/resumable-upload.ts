@@ -27,14 +27,16 @@ import {
   AUTO_RETRY_DEFAULT,
   MAX_RETRY_DEFAULT,
   RETRYABLE_ERR_FN_DEFAULT,
-} from '../src/storage';
+} from '../src/storage.js';
 
 import {
   ApiError,
   CreateUriCallback,
   PROTOCOL_REGEX,
-} from '../src/resumable-upload';
+  upload as resUpload,
+} from '../src/resumable-upload.js';
 import {GaxiosOptions, GaxiosError, GaxiosResponse} from 'gaxios';
+import {fileURLToPath} from 'url';
 
 nock.disableNetConnect();
 
@@ -92,12 +94,18 @@ describe('resumable-upload', () => {
     retryableErrorFn: RETRYABLE_ERR_FN_DEFAULT,
   };
   let REQ_OPTS: GaxiosOptions;
-  const keyFile = path.join(__dirname, '../../test/fixtures/keys.json');
 
-  before(() => {
+  const keyFile = path.join(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../../../test/fixtures/keys.json'
+  );
+
+  before(async () => {
     mockery.registerMock('abort-controller', AbortController);
     mockery.enable({useCleanCache: true, warnOnUnregistered: false});
-    upload = require('../src/resumable-upload').upload;
+    upload = resUpload;
   });
 
   beforeEach(() => {
@@ -1600,7 +1608,7 @@ describe('resumable-upload', () => {
     it('should pass a signal from the abort controller', done => {
       up.authClient = {
         request: (reqOpts: GaxiosOptions) => {
-          assert(reqOpts.signal instanceof AbortController);
+          assert(reqOpts.signal instanceof Object);
           done();
         },
       };

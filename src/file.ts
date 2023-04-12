@@ -29,7 +29,7 @@ import compressible from 'compressible';
 import * as crypto from 'crypto';
 import extend from 'extend';
 import * as fs from 'fs';
-import * as mime from 'mime';
+import mime from 'mime';
 import * as resumableUpload from './resumable-upload.js';
 import {Writable, Readable, pipeline, Transform, PassThrough} from 'stream';
 import * as zlib from 'zlib';

@@ -26,8 +26,7 @@ import {describe, it, before, beforeEach, after, afterEach} from 'mocha';
 import * as mime from 'mime-types';
 import pLimit from 'p-limit';
 import * as path from 'path';
-import proxyquire from 'proxyquire';
-
+import esmock from 'esmock';
 import * as stream from 'stream';
 import {Bucket, Channel, Notification, CRC32C} from '../src/index.js';
 import {
@@ -171,7 +170,7 @@ class FakeServiceObject extends ServiceObject {
 }
 
 const fakeSigner = {
-  URLSigner: () => {},
+  URLSigner: function () {},
 };
 
 class HTTPError extends Error {
@@ -205,22 +204,24 @@ describe('Bucket', () => {
   };
   const BUCKET_NAME = 'test-bucket';
 
-  before(() => {
-    Bucket = proxyquire('../src/bucket.js', {
-      fs: fakeFs,
-      'p-limit': fakePLimit,
-      '@google-cloud/promisify': fakePromisify,
-      '@google-cloud/paginator': fakePaginator,
-      './nodejs-common': {
-        ServiceObject: FakeServiceObject,
-        util: fakeUtil,
-      },
-      './acl.js': {Acl: FakeAcl},
-      './file.js': {File: FakeFile},
-      './iam.js': {Iam: FakeIam},
-      './notification.js': {Notification: FakeNotification},
-      './signer.js': fakeSigner,
-    }).Bucket;
+  before(async () => {
+    Bucket = (
+      await esmock('../src/bucket.js', {
+        fs: fakeFs,
+        'p-limit': fakePLimit,
+        '@google-cloud/promisify': fakePromisify,
+        '@google-cloud/paginator': fakePaginator,
+        '../src/nodejs-common/index.js': {
+          ServiceObject: FakeServiceObject,
+          util: fakeUtil,
+        },
+        '../src/acl.js': {Acl: FakeAcl},
+        '../src/file.js': {File: FakeFile},
+        '../src/iam.js': {Iam: FakeIam},
+        '../src/notification.js': {Notification: FakeNotification},
+        '../src/signer.js': fakeSigner,
+      })
+    ).Bucket;
   });
 
   beforeEach(() => {
@@ -2122,7 +2123,7 @@ describe('Bucket', () => {
     let urlSignerStub: sinon.SinonStub;
     let SIGNED_URL_CONFIG: GetBucketSignedUrlConfig;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       sandbox = sinon.createSandbox();
 
       signerGetSignedUrlStub = sandbox.stub().resolves(EXPECTED_SIGNED_URL);
@@ -2136,12 +2137,31 @@ describe('Bucket', () => {
         signer
       );
 
+      Bucket = (
+        await esmock('../src/bucket.js', {
+          fs: fakeFs,
+          'p-limit': fakePLimit,
+          '@google-cloud/promisify': fakePromisify,
+          '@google-cloud/paginator': fakePaginator,
+          '../src/nodejs-common/index.js': {
+            ServiceObject: FakeServiceObject,
+            util: fakeUtil,
+          },
+          '../src/acl.js': {Acl: FakeAcl},
+          '../src/file.js': {File: FakeFile},
+          '../src/iam.js': {Iam: FakeIam},
+          '../src/notification.js': {Notification: FakeNotification},
+          '../src/signer.js': fakeSigner,
+        })
+      ).Bucket;
+
       SIGNED_URL_CONFIG = {
         version: 'v4',
         expires: new Date(),
         action: 'list',
         cname: CNAME,
       };
+      bucket = new Bucket(STORAGE, BUCKET_NAME);
     });
 
     afterEach(() => sandbox.restore());
@@ -2156,10 +2176,9 @@ describe('Bucket', () => {
           assert.strictEqual(bucket.signer, signer);
           assert.strictEqual(signedUrl, EXPECTED_SIGNED_URL);
 
-          const ctorArgs = urlSignerStub.getCall(0).args;
+          const ctorArgs = urlSignerStub.getCall(1).args;
           assert.strictEqual(ctorArgs[0], bucket.storage.authClient);
           assert.strictEqual(ctorArgs[1], bucket);
-
           const getSignedUrlArgs = signerGetSignedUrlStub.getCall(0).args;
           assert.deepStrictEqual(getSignedUrlArgs[0], {
             method: 'GET',
@@ -2654,14 +2673,14 @@ describe('Bucket', () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       path.dirname(fileURLToPath(import.meta.url)),
-      '../../test/testdata/',
+      '../../../test/testdata/',
       basename
     );
     const nonExistentFilePath = path.join(
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       path.dirname(fileURLToPath(import.meta.url)),
-      '../../test/testdata/',
+      '../../../test/testdata/',
       'non-existent-file'
     );
     const metadata = {

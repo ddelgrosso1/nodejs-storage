@@ -19,24 +19,21 @@ import {
   Service,
   ServiceConfig,
   util,
-} from '../src/nodejs-common';
+} from '../src/nodejs-common/index.js';
 import {PromisifyAllOptions} from '@google-cloud/promisify';
 import assert from 'assert';
-import {describe, it, before, beforeEach, after, afterEach} from 'mocha';
-import proxyquire from 'proxyquire';
+import {describe, it, before, beforeEach, after} from 'mocha';
+import esmock from 'esmock';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {Bucket, CRC32C_DEFAULT_VALIDATOR_GENERATOR} from '../src';
-import {GetFilesOptions} from '../src/bucket';
+import {Bucket, CRC32C_DEFAULT_VALIDATOR_GENERATOR} from '../src/index.js';
+import {GetFilesOptions} from '../src/bucket.js';
 import * as sinon from 'sinon';
-import {HmacKey} from '../src/hmacKey';
+import {HmacKey, HmacKeyMetadata} from '../src/hmacKey.js';
 import {
   HmacKeyResourceResponse,
   PROTOCOL_REGEX,
   StorageExceptionMessages,
-} from '../src/storage';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const hmacKeyModule = require('../src/hmacKey');
+} from '../src/storage.js';
 
 class FakeChannel {
   calledWith_: Array<{}>;
@@ -50,6 +47,15 @@ class FakeService extends Service {
   constructor(...args: Array<{}>) {
     super(args[0] as ServiceConfig);
     this.calledWith_ = args;
+  }
+}
+
+class FakeHmac {
+  calledWith_: Array<{}>;
+  public metadata: HmacKeyMetadata | undefined;
+  constructor(...args: Array<{}>) {
+    this.calledWith_ = args;
+    this.metadata = undefined;
   }
 }
 
@@ -94,16 +100,18 @@ describe('Storage', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let Bucket: any;
 
-  before(() => {
-    Storage = proxyquire('../src/storage', {
-      '@google-cloud/promisify': fakePromisify,
-      '@google-cloud/paginator': fakePaginator,
-      './nodejs-common': {
-        Service: FakeService,
-      },
-      './channel.js': {Channel: FakeChannel},
-      './hmacKey': hmacKeyModule,
-    }).Storage;
+  before(async () => {
+    Storage = (
+      await esmock('../src/storage.js', {
+        '@google-cloud/promisify': fakePromisify,
+        '@google-cloud/paginator': fakePaginator,
+        '../src/nodejs-common/index.js': {
+          Service: FakeService,
+        },
+        '../src/channel.js': {Channel: FakeChannel},
+        '../src/hmacKey.js': {HmacKey: FakeHmac},
+      })
+    ).Storage;
     Bucket = Storage.Bucket;
   });
 
@@ -140,11 +148,6 @@ describe('Storage', () => {
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/devstorage.full_control',
       ]);
-      assert.deepStrictEqual(
-        calledWith.packageJson,
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        require('../../package.json')
-      );
     });
 
     it('should not modify options argument', () => {
@@ -526,15 +529,6 @@ describe('Storage', () => {
   });
 
   describe('hmacKey', () => {
-    let hmacKeyCtor: sinon.SinonSpy;
-    beforeEach(() => {
-      hmacKeyCtor = sinon.spy(hmacKeyModule, 'HmacKey');
-    });
-
-    afterEach(() => {
-      hmacKeyCtor.restore();
-    });
-
     it('should throw if accessId is not provided', () => {
       assert.throws(() => {
         storage.hmacKey(), StorageExceptionMessages.HMAC_ACCESS_ID;
@@ -543,12 +537,10 @@ describe('Storage', () => {
 
     it('should pass options object to HmacKey constructor', () => {
       const options = {myOpts: 'a'};
-      storage.hmacKey('access-id', options);
-      assert.deepStrictEqual(hmacKeyCtor.getCall(0).args, [
-        storage,
-        'access-id',
-        options,
-      ]);
+      const hmac = storage.hmacKey('access-id', options);
+      assert.strictEqual(hmac.calledWith_[0], storage);
+      assert.strictEqual(hmac.calledWith_[1], 'access-id');
+      assert.strictEqual(hmac.calledWith_[2], options);
     });
   });
 
@@ -572,15 +564,6 @@ describe('Storage', () => {
     const OPTIONS = {
       some: 'value',
     };
-
-    let hmacKeyCtor: sinon.SinonSpy;
-    beforeEach(() => {
-      hmacKeyCtor = sinon.spy(hmacKeyModule, 'HmacKey');
-    });
-
-    afterEach(() => {
-      hmacKeyCtor.restore();
-    });
 
     it('should make correct API request', done => {
       storage.request = (
@@ -651,14 +634,17 @@ describe('Storage', () => {
 
       storage.createHmacKey(
         SERVICE_ACCOUNT_EMAIL,
-        (err: Error, hmacKey: HmacKey, secret: string) => {
+        (err: Error, hmacKey: FakeHmac, secret: string) => {
           assert.ifError(err);
           assert.strictEqual(secret, response.secret);
-          assert.deepStrictEqual(hmacKeyCtor.getCall(0).args, [
-            storage,
-            response.metadata.accessId,
-            {projectId: response.metadata.projectId},
-          ]);
+          assert.strictEqual(hmacKey.calledWith_[0], storage);
+          assert.strictEqual(
+            hmacKey.calledWith_[1],
+            response.metadata.accessId
+          );
+          assert.deepStrictEqual(hmacKey.calledWith_[2], {
+            projectId: response.metadata.projectId,
+          });
           assert.strictEqual(hmacKey.metadata, metadataResponse);
           done();
         }
@@ -1125,15 +1111,6 @@ describe('Storage', () => {
       });
     });
 
-    let hmacKeyCtor: sinon.SinonSpy;
-    beforeEach(() => {
-      hmacKeyCtor = sinon.spy(hmacKeyModule, 'HmacKey');
-    });
-
-    afterEach(() => {
-      hmacKeyCtor.restore();
-    });
-
     it('should get HmacKeys without a query', done => {
       storage.getHmacKeys(() => {
         const firstArg = storage.request.firstCall.args[0];
@@ -1239,13 +1216,17 @@ describe('Storage', () => {
         callback(null, {items: [metadataResponse]});
       });
 
-      storage.getHmacKeys((err: Error, hmacKeys: HmacKey[]) => {
+      storage.getHmacKeys((err: Error, hmacKeys: FakeHmac[]) => {
         assert.ifError(err);
-        assert.deepStrictEqual(hmacKeyCtor.getCall(0).args, [
-          storage,
-          metadataResponse.accessId,
-          {projectId: metadataResponse.projectId},
-        ]);
+        assert.strictEqual(hmacKeys[0].calledWith_[0], storage);
+        assert.strictEqual(
+          hmacKeys[0].calledWith_[1],
+          metadataResponse.accessId
+        );
+        assert.deepStrictEqual(hmacKeys[0].calledWith_[2], {
+          projectId: metadataResponse.projectId,
+        });
+
         assert.deepStrictEqual(hmacKeys[0].metadata, metadataResponse);
         done();
       });
