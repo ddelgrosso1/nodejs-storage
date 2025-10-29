@@ -1177,6 +1177,28 @@ describe('Storage', () => {
         done();
       });
     });
+
+    it('should return unreachable buckets', done => {
+      const unreachable = ['bucket-1', 'bucket-2'];
+      storage.request = (
+        reqOpts: DecorateRequestOptions,
+        callback: Function
+      ) => {
+        callback(null, {
+          items: [{id: 'fake-bucket-name'}],
+          unreachable: unreachable,
+        });
+      };
+      storage.getBuckets(
+        (err: Error, buckets: Bucket[], nextQuery: {}, apiResponse: {}) => {
+          assert.deepStrictEqual(apiResponse, {
+            items: [{id: 'fake-bucket-name'}],
+            unreachable: unreachable,
+          });
+          done();
+        }
+      );
+    });
   });
 
   describe('getHmacKeys', () => {

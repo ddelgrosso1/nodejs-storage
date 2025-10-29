@@ -1252,6 +1252,19 @@ describe('storage', function () {
           done();
         });
     });
+
+    it('should get buckets with returnPartialSuccess', async () => {
+      const [buckets, , response] = await storage.getBuckets({
+        returnPartialSuccess: true,
+      });
+      const createdBuckets = buckets.filter(bucket => {
+        return bucketsToCreate.indexOf(bucket.name) > -1;
+      });
+      assert.strictEqual(createdBuckets.length, bucketsToCreate.length);
+      assert(
+        (response as {unreachable?: string[]}).unreachable instanceof Array
+      );
+    });
   });
 
   describe('bucket metadata', () => {

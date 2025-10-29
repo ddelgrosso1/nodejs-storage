@@ -170,12 +170,12 @@ export interface BucketCallback {
   (err: Error | null, bucket?: Bucket | null, apiResponse?: unknown): void;
 }
 
-export type GetBucketsResponse = [Bucket[], {}, unknown];
+export type GetBucketsResponse = [Bucket[], {unreachable?: string[]}, unknown];
 export interface GetBucketsCallback {
   (
     err: Error | null,
     buckets: Bucket[],
-    nextQuery?: {},
+    nextQuery?: {unreachable?: string[]},
     apiResponse?: unknown
   ): void;
 }
@@ -189,6 +189,7 @@ export interface GetBucketsRequest {
   userProject?: string;
   softDeleted?: boolean;
   generation?: number;
+  returnPartialSuccess?: boolean;
 }
 
 export interface HmacKeyResourceResponse {
@@ -1345,7 +1346,10 @@ export class Storage extends Service {
         });
 
         const nextQuery = resp.nextPageToken
-          ? Object.assign({}, options, {pageToken: resp.nextPageToken})
+          ? Object.assign({}, options, {
+              pageToken: resp.nextPageToken,
+              unreachable: resp.unreachable,
+            })
           : null;
 
         callback(null, buckets, nextQuery, resp);
